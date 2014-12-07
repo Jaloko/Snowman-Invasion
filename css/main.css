@@ -1,0 +1,102 @@
+
+body {
+	font-family: Verdana;
+	font-size: 1em;
+	margin: 0;
+	padding: 0;
+	text-align: center;
+	color: #fff;
+	background-color: #334;
+}
+
+h1 {
+	margin-top: 10px;
+}
+
+input[type="radio"] {
+	display: none;
+}
+
+input[type="checkbox"] {
+	display: none;
+}
+
+p {
+	margin: 2px;
+}
+
+.hidden {
+	display: none;
+}
+
+.red {
+	border: 2px solid #AA0000;
+}
+
+.green {
+	border: 2px solid #00AA00;	
+}
+
+#turretsContainer {
+	display: block;
+	width: 100%;
+	height: 200px;
+}
+
+.turret {
+	display: inline-block;
+	background-color: #223;
+	width: 200px;
+	padding: 5px;
+	cursor: pointer;
+}
+
+.turret label {
+	cursor: pointer;
+}
+
+.info {
+	display: inline-block;
+}
+
+.turret-image {
+	margin-top: 25px;
+	margin-bottom: 25px;
+	display: inline-block;
+	width: 48px;
+	height: 48px;
+	background-size: 100%;
+	background-repeat: none;
+}
+
+#cannon-turret-image {
+	background-image: url('../img/game/turrets/cannon-turret.png');
+}
+
+#toxic-turret-image {
+	background-image: url('../img/game/turrets/toxic-turret.png');
+}
+
+#ice-turret-image {
+	background-image: url('../img/game/turrets/ice-turret.png');
+}
+
+#magma-turret-image {
+	background-image: url('../img/game/turrets/magma-turret.png');
+}
+
+input[type="radio"]#cannon-turret-rad:checked ~ #cannon-turret{
+	background-color: #445;
+}
+
+input[type="radio"]#toxic-turret-rad:checked ~ #toxic-turret{
+	background-color: #445;
+}
+
+input[type="radio"]#ice-turret-rad:checked ~ #ice-turret{
+	background-color: #445;
+}
+
+input[type="radio"]#magma-turret-rad:checked ~ #magma-turret{
+	background-color: #445;
+}

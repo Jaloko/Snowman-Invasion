@@ -1,0 +1,79 @@
+<html>
+	<head>
+		<title>Ludum Dare 31 - Entire Game on One Screen</title>
+		<link rel="stylesheet" type="text/css" href="css/main.css">
+		<script src="js/astar.js" type="text/javascript"></script>
+	</head>
+	<body>
+		<h1>Ludum Dare 31</h1>
+		<h2>Theme: Entire Game on One Screen</h2>
+		<div>
+			<canvas id="game" width="960" height="528" style="border:1px solid #000000;">
+				Please update your browser to view the content.
+			</canvas>
+			<script src="js/game.js" type="text/javascript"></script>
+			<br>
+			<div id="turretsContainer">
+				<div id="turrets" class="hidden">
+					<input type="radio" name="turrets" value="cannon-turret-rad" id="cannon-turret-rad" checked>
+					<input type="radio" name="turrets" value="toxic-turret-rad" id="toxic-turret-rad">
+					<input type="radio" name="turrets" value="ice-turret-rad" id="ice-turret-rad">
+					<input type="radio" name="turrets" value="magma-turret-rad" id="magma-turret-rad">
+
+					<div id="cannon-turret" class="turret">
+						<label for="cannon-turret-rad">
+							<div id="cannon-turret-image" class="turret-image">
+							</div>
+							<div class="info">
+								<p>Cannon Turret</p>
+								<p>Cost: 75</p>
+								<p>Damage: 10</p>
+								<p>Speed: Slow</p>
+								<p>Range: Long</p>
+							</div>
+						</label>
+					</div>
+					<div id="toxic-turret" class="turret">
+						<label for="toxic-turret-rad">
+							<div id="toxic-turret-image" class="turret-image">
+							</div>
+							<div class="info">
+								<p>Toxic Turret</p>
+								<p>Cost: 200</p>
+								<p>Damage: 5</p>
+								<p>Speed: Very Fast</p>
+								<p>Range: Medium</p>
+							</div>
+						</label>
+					</div>
+					<div id="ice-turret" class="turret">
+						<label for="ice-turret-rad">
+							<div id="ice-turret-image" class="turret-image">
+							</div>
+							<div class="info">
+								<p>Ice Turret</p>
+								<p>Cost: 400</p>
+								<p>Damage: 0</p>
+								<p>Speed: N/A</p>
+								<p>Range: Short</p>
+							</div>
+						</label>
+					</div>
+					<div id="magma-turret" class="turret">
+						<label for="magma-turret-rad">
+							<div id="magma-turret-image" class="turret-image">
+							</div>
+							<div class="info">
+								<p>Magma Turret</p>
+								<p>Cost: 450</p>
+								<p>Damage: 15</p>
+								<p>Speed: Fast</p>
+								<p>Range: Short</p>
+							</div>
+						</label>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
