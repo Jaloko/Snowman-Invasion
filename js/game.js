@@ -24,7 +24,7 @@ var menu = false;
 var lastESCPress = false;
 var lastF2Press = false;
 
-var healthAmount = 50;
+var healthMultiplier = 1;
 
 var c = document.getElementById("game");
 var ctx = c.getContext("2d");
@@ -82,6 +82,8 @@ var images = {
 	iceTurret : new Image(),
 	magmaTurret : new Image(),
 	evilSnowman : new Image(),
+	armouredEvilSnowman : new Image(),
+	fullArmouredEvilSnowman : new Image(),
 	regularBullet : new Image(),
 	toxicBullet : new Image(),
 	magmaBullet : new Image(),
@@ -111,6 +113,8 @@ images.toxicTurret.src = 'img/game/turrets/toxic-turret.png';
 images.iceTurret.src = 'img/game/turrets/ice-turret.png';
 images.magmaTurret.src = 'img/game/turrets/magma-turret.png';
 images.evilSnowman.src = 'img/game/mobs/evil-snowman.png';
+images.armouredEvilSnowman.src = 'img/game/mobs/armoured-evil-snowman.png';
+images.fullArmouredEvilSnowman.src = 'img/game/mobs/full-armoured-evil-snowman.png';
 images.regularBullet.src = 'img/game/bullets/regular-bullet.png';
 images.toxicBullet.src = 'img/game/bullets/toxic-bullet.png';
 images.magmaBullet.src = 'img/game/bullets/magma-bullet.png';
@@ -320,12 +324,13 @@ function turret(type, fireRate, damage, radius) {
 	}
 }
 
-function enemy(arrayIndex, name, x, y, health) {
-	this.arrayIndex = arrayIndex,
+function enemy(name, type, x, y, health, baseSpeed) {
 	this.name = name,
+	this.type = type,
 	this.x = x,
 	this.y = y,
-	this.speed = 2,
+	this.baseSpeed = baseSpeed,
+	this.speed = baseSpeed,
 	this.tileX = 0,
 	this.tileY = 0,
 	this.rotation = 0,
@@ -406,7 +411,13 @@ function enemy(arrayIndex, name, x, y, health) {
 		ctx.translate(tileSize / 2, tileSize / 2);
 		// Rotates around origin point
 		ctx.rotate(this.rotation*Math.PI/180);
-		ctx.drawImage(images.evilSnowman, -tileSize / 2, -tileSize / 2);
+		if(this.type == 0) {
+			ctx.drawImage(images.evilSnowman, -tileSize / 2, -tileSize / 2);
+		} else if(this.type == 1) {
+			ctx.drawImage(images.armouredEvilSnowman, -tileSize / 2, -tileSize / 2);	
+		} else if(this.type == 2) {
+			ctx.drawImage(images.fullArmouredEvilSnowman, -tileSize / 2, -tileSize / 2);	
+		}
 		// Restores canvas
 		ctx.restore();
 
@@ -454,7 +465,14 @@ function bullet(id, type, damage, angle, x, y, lifespan) {
 				}
 				enemies[e].health -= damage;
 				if(enemies[e].health <= 0) {
-					player.cash += 10;
+					if(enemies[e].type == 0) {
+						player.cash += 10;
+					} else if(enemies[e].type == 1) {
+						player.cash += 25;
+					} else if(enemies[e].type == 2) {
+						player.cash += 50;
+					}
+
 					enemies.splice(e, 1);
 					snowmenKilled++;
 				}
@@ -598,13 +616,27 @@ function update() {
 			// Changes the difficulty based on time
 			if(new Date().getTime() > difficultyTimer + 20000) {
 				difficultyTimer += 20000;
-				healthAmount += 25;
+				healthMultiplier += 0.2;
+				if(mobSpawnRate >= 500) {
+					mobSpawnRate -= 50;
+				} else {
+					healthMultiplier += 0.2;
+				}
+
 			}
+
 
 			// Mob spawn rate
 			if(new Date().getTime() > mobSpawnTime + mobSpawnRate) {
 				mobSpawnTime += mobSpawnRate;
-				enemies.push(new enemy(enemies.length, "Evil Snowman", 2 * tileSize, 0 * tileSize, healthAmount));
+				var rand = Math.floor(Math.random() * 10);
+				if(rand == 0 || rand == 1 || rand == 2 || rand == 3 || rand == 4 || rand == 5 || rand == 6) {
+					enemies.push(new enemy("Evil Snowman", 0, 2 * tileSize, 0 * tileSize, 50 * healthMultiplier, 2));
+				} else if(rand == 7 || rand == 8) {
+					enemies.push(new enemy("Armoured Evil Snowman", 1, 2 * tileSize, 0 * tileSize,  150 * healthMultiplier, 2));
+				} else if(rand == 9) {
+					enemies.push(new enemy("Full Armoured Evil Snowman", 2, 2 * tileSize, 0 * tileSize,  250 * healthMultiplier, 2));
+				}
 			}
 		}
 
@@ -818,92 +850,115 @@ c.addEventListener('mousemove', function(evt) {
 // Checks for mouse click
 c.addEventListener("mousedown", function(evt) {
 	lastMutePress = false;
-	if(mainMenu == true) {
-		// Play Button
-		if(mousePos.x >= playButton[0] && mousePos.x <= playButton[0] + 200) {
-			if(mousePos.y >= playButton[1] && mousePos.y <= playButton[1] + 50) {
-				mainMenu = false;
-				newGame();
+	if(evt.button == 0) {
+		if(mainMenu == true) {
+			// Play Button
+			if(mousePos.x >= playButton[0] && mousePos.x <= playButton[0] + 200) {
+				if(mousePos.y >= playButton[1] && mousePos.y <= playButton[1] + 50) {
+					mainMenu = false;
+					newGame();
+				}
 			}
-		}
-		// Help Button
-		if(mousePos.x >= helpButton[0] && mousePos.x <= helpButton[0] + 200) {
-			if(mousePos.y >= helpButton[1] && mousePos.y <= helpButton[1] + 50) {
-				helpScreen = true;
+			// Help Button
+			if(mousePos.x >= helpButton[0] && mousePos.x <= helpButton[0] + 200) {
+				if(mousePos.y >= helpButton[1] && mousePos.y <= helpButton[1] + 50) {
+					helpScreen = true;
+				}
 			}
-		}
 
-		// Audio Filter
-		if(mousePos.x >= muteAudioMainMenuButton[0] && mousePos.x <= muteAudioMainMenuButton[0] + 200) {
-			if(mousePos.y >= muteAudioMainMenuButton[1] && mousePos.y <= muteAudioMainMenuButton[1] + 50
-				&& lastMutePress != true) {
-				audioFilter();
+			// Audio Filter
+			if(mousePos.x >= muteAudioMainMenuButton[0] && mousePos.x <= muteAudioMainMenuButton[0] + 200) {
+				if(mousePos.y >= muteAudioMainMenuButton[1] && mousePos.y <= muteAudioMainMenuButton[1] + 50
+					&& lastMutePress != true) {
+					audioFilter();
+				}
 			}
-		}
 
-		if(helpScreen == true) {
-			// Back Button
-			if(mousePos.x >= backButton[0] && mousePos.x <= backButton[0] + 200) {
-				if(mousePos.y >= backButton[1] && mousePos.y <= backButton[1] + 50) {
-					helpScreen = false;
-				} 
-			}
-		}
-	} else if(gamePaused == false && gameOver == false) {
-		if(document.getElementById("cannon-turret-rad").checked) {
-			if(player.cash >= 75) {
-				if(map[Math.floor(mousePos.y / tileSize)][Math.floor(mousePos.x / tileSize)] != 1 &&
-				turrets[Math.floor(mousePos.y / tileSize)][Math.floor(mousePos.x / tileSize)] == null) {
-					turrets[Math.floor(mousePos.y / tileSize)][Math.floor(mousePos.x / tileSize)] = new turret(0, 1, 10, 200);
-					player.cash -= 75;
+			if(helpScreen == true) {
+				// Back Button
+				if(mousePos.x >= backButton[0] && mousePos.x <= backButton[0] + 200) {
+					if(mousePos.y >= backButton[1] && mousePos.y <= backButton[1] + 50) {
+						helpScreen = false;
+					} 
 				}
 			}
-		} else if(document.getElementById("toxic-turret-rad").checked) {
-			if(player.cash >= 200) {
-				if(map[Math.floor(mousePos.y / tileSize)][Math.floor(mousePos.x / tileSize)] != 1 &&
-				turrets[Math.floor(mousePos.y / tileSize)][Math.floor(mousePos.x / tileSize)] == null) {
-					turrets[Math.floor(mousePos.y / tileSize)][Math.floor(mousePos.x / tileSize)] = new turret(1, 5, 5, 160);
-					player.cash -= 200;
+		} else if(gamePaused == false && gameOver == false) {
+			if(document.getElementById("cannon-turret-rad").checked) {
+				if(player.cash >= 75) {
+					if(map[Math.floor(mousePos.y / tileSize)][Math.floor(mousePos.x / tileSize)] != 1 &&
+					turrets[Math.floor(mousePos.y / tileSize)][Math.floor(mousePos.x / tileSize)] == null) {
+						turrets[Math.floor(mousePos.y / tileSize)][Math.floor(mousePos.x / tileSize)] = new turret(0, 1, 12, 240);
+						player.cash -= 75;
+					}
+				}
+			} else if(document.getElementById("toxic-turret-rad").checked) {
+				if(player.cash >= 200) {
+					if(map[Math.floor(mousePos.y / tileSize)][Math.floor(mousePos.x / tileSize)] != 1 &&
+					turrets[Math.floor(mousePos.y / tileSize)][Math.floor(mousePos.x / tileSize)] == null) {
+						turrets[Math.floor(mousePos.y / tileSize)][Math.floor(mousePos.x / tileSize)] = new turret(1, 5, 5, 160);
+						player.cash -= 200;
+					}
+				}
+			} else if(document.getElementById("ice-turret-rad").checked) {
+				if(player.cash >= 400) {
+					if(map[Math.floor(mousePos.y / tileSize)][Math.floor(mousePos.x / tileSize)] != 1 &&
+					turrets[Math.floor(mousePos.y / tileSize)][Math.floor(mousePos.x / tileSize)] == null) {
+						turrets[Math.floor(mousePos.y / tileSize)][Math.floor(mousePos.x / tileSize)] = new turret(2, 0, 3, 80);
+						player.cash -= 400;
+					}
+				}
+			} else if(document.getElementById("magma-turret-rad").checked) {
+				if(player.cash >= 450) {
+					if(map[Math.floor(mousePos.y / tileSize)][Math.floor(mousePos.x / tileSize)] != 1 &&
+					turrets[Math.floor(mousePos.y / tileSize)][Math.floor(mousePos.x / tileSize)] == null) {
+						turrets[Math.floor(mousePos.y / tileSize)][Math.floor(mousePos.x / tileSize)] = new turret(3, 15, 3, 100);
+						player.cash -= 450;
+					}
 				}
 			}
-		} else if(document.getElementById("ice-turret-rad").checked) {
-			if(player.cash >= 400) {
-				if(map[Math.floor(mousePos.y / tileSize)][Math.floor(mousePos.x / tileSize)] != 1 &&
-				turrets[Math.floor(mousePos.y / tileSize)][Math.floor(mousePos.x / tileSize)] == null) {
-					turrets[Math.floor(mousePos.y / tileSize)][Math.floor(mousePos.x / tileSize)] = new turret(2, 0, 3, 80);
-					player.cash -= 400;
-				}
-			}
-		} else if(document.getElementById("magma-turret-rad").checked) {
-			if(player.cash >= 450) {
-				if(map[Math.floor(mousePos.y / tileSize)][Math.floor(mousePos.x / tileSize)] != 1 &&
-				turrets[Math.floor(mousePos.y / tileSize)][Math.floor(mousePos.x / tileSize)] == null) {
-					turrets[Math.floor(mousePos.y / tileSize)][Math.floor(mousePos.x / tileSize)] = new turret(3, 15, 3, 100);
-					player.cash -= 450;
-				}
-			}
-		}
-	} else if(menu == true) {
+		} else if(menu == true) {
 
-		// Main Menu
-		if(mousePos.x >= mainMenuButton[0] && mousePos.x <= mainMenuButton[0] + 200) {
-			if(mousePos.y >= mainMenuButton[1] && mousePos.y <= mainMenuButton[1] + 50) {
-				mainMenu = true;
-				snowballs = [];
-				for(var s = 0; s < 1000; s++) {
-					snowballs.push(new snowball((Math.random() * 960), -(Math.random() * 2000), Math.random() * 1 + 0.5));
-				}
-			}	
-		}
+			// Main Menu
+			if(mousePos.x >= mainMenuButton[0] && mousePos.x <= mainMenuButton[0] + 200) {
+				if(mousePos.y >= mainMenuButton[1] && mousePos.y <= mainMenuButton[1] + 50) {
+					mainMenu = true;
+					snowballs = [];
+					for(var s = 0; s < 1000; s++) {
+						snowballs.push(new snowball((Math.random() * 960), -(Math.random() * 2000), Math.random() * 1 + 0.5));
+					}
+				}	
+			}
 
-		// Mute Audio
-		if(mousePos.x >= muteAudioButton[0] && mousePos.x <= muteAudioButton[0] + 200) {
-			if(mousePos.y >= muteAudioButton[1] && mousePos.y <= muteAudioButton[1] + 50 
-				&& lastMutePress != true) {
-				audioFilter();
+			// Mute Audio
+			if(mousePos.x >= muteAudioButton[0] && mousePos.x <= muteAudioButton[0] + 200) {
+				if(mousePos.y >= muteAudioButton[1] && mousePos.y <= muteAudioButton[1] + 50 
+					&& lastMutePress != true) {
+					audioFilter();
+				}
 			}
 		}
+	} else if(evt.button == 2) {
+		if(mainMenu == true) {
+			//Do nothing
+		} else if(menu == 2) {
+			//Do nothing
+		} else if(gamePaused == false && gameOver == false) {
+			if(map[Math.floor(mousePos.y / tileSize)][Math.floor(mousePos.x / tileSize)] != 1 &&
+			turrets[Math.floor(mousePos.y / tileSize)][Math.floor(mousePos.x / tileSize)] != null) {
+				if(turrets[Math.floor(mousePos.y / tileSize)][Math.floor(mousePos.x / tileSize)].type == 0) {
+					player.cash += 50;
+				} else if(turrets[Math.floor(mousePos.y / tileSize)][Math.floor(mousePos.x / tileSize)].type == 1) {
+					player.cash += 150;
+				} else if(turrets[Math.floor(mousePos.y / tileSize)][Math.floor(mousePos.x / tileSize)].type == 2) {
+					player.cash += 300;
+				} else if(turrets[Math.floor(mousePos.y / tileSize)][Math.floor(mousePos.x / tileSize)].type == 2) {
+					player.cash += 338;
+				}
+				turrets[Math.floor(mousePos.y / tileSize)][Math.floor(mousePos.x / tileSize)] = null;
+			}
+		}	
 	}
+
 
 }, false);
 
@@ -923,5 +978,9 @@ sounds.theme.addEventListener('ended', function() {
     this.currentTime = 0;
     this.play();
 }, false);
-
+sounds.theme.volume = 1;
 sounds.theme.play();
+
+c.oncontextmenu = function() {
+     return false;  
+} 
